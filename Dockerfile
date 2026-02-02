@@ -41,10 +41,21 @@ RUN apt-get update \
     build-essential \
     procps \
     file \
+    sudo \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Homebrew (CI=1 allows root installation)
-RUN CI=1 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Create linuxbrew user for Homebrew installation
+RUN useradd -m -s /bin/bash linuxbrew && \
+    usermod -aG sudo linuxbrew && \
+    echo "linuxbrew ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Install Homebrew as linuxbrew user
+USER linuxbrew
+WORKDIR /home/linuxbrew
+RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Switch back to root
+USER root
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
 WORKDIR /app
