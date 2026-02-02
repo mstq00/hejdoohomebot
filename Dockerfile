@@ -43,8 +43,8 @@ RUN apt-get update \
     file \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Homebrew
-RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Install Homebrew (CI=1 allows root installation)
+RUN CI=1 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
 WORKDIR /app
